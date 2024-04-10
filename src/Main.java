@@ -1,95 +1,100 @@
-import java.util.Map;
-
-class Course{
-    private String course_name;
-    private String category;
-    private int months_duration;
-    private static int number_of_students = 0;
-    public Course(String course_name, String category, int months_duration) {
-        this.course_name = course_name;
-        this.category = category;
-        this.months_duration = months_duration;
-    }
-}
-
-class Grade{
-    private Course course;
-    private double grade;
-
-    public Grade(Course course, double grade) {
-        this.course = course;
-        this.grade = grade;
-    }
-}
-
-class User{
-    protected String username;
-    protected static int user_count = 0;
-    public User(String _username){
-        this.username = _username;
-        user_count++;
-    }
-}
-
-class Student extends User{
-    private Course[] enrolled_courses;
-    private Grade[] grades;
-
-    public Student(String _username) {
-        super(_username);
-    }
-}
-
-class Instructor extends User{
-    private Course[] teaching_courses;
-    private String Profession;
-
-    public Instructor(String _username, Course[] teaching_courses, String profession) {
-        super(_username);
-        this.teaching_courses = teaching_courses;
-        Profession = profession;
-    }
-}
-class Assessment {
-    protected String name;
-    protected double max_grade;
-
-    public Assessment(String type, double max_grade) {
-        this.name = type;
-        this.max_grade = max_grade;
-    }
-
-}
-
-class Quiz extends Assessment {
-    private boolean Timed;
-    private Map<Integer, String> question;
-    private Map<Integer, String[]> answers;
-    private Map<Integer, String> correct_answer;
-    private Map<Integer, Double> points;
-    private Map<Integer, Integer> question_time; // secunde
-    public Quiz(String type, double max_grade, boolean timed) {
-        super(type, max_grade);
-        Timed = timed;
-    }
-
-    public Quiz(String type, double max_grade, int number_of_questions) {
-        super(type, max_grade);
-    }
-}
-
-class Test extends Assessment{
-    private boolean Timed;
-    private Map<Integer, String> question;
-    private Map<Integer, Integer> question_time; // secunde
-    public Test(String type, double max_grade, boolean timed) {
-        super(type, max_grade);
-        Timed = timed;
-    }
-}
+import java.util.Scanner;
 
 public class Main {
+    static Services service = new Services();
+
     public static void main(String[] args) {
-        System.out.println("yes");
+        int console_input = -1;
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Welcome!\n");
+        while (console_input != 0) {
+            System.out.println("\nEnter 0 to quit\nEnter 1 to manage users\nEnter 2 to manage courses\n");
+            console_input = scanner.nextInt();
+            switch (console_input) {
+                case 0:
+                    break;
+                case 1:
+                    int console_input_1 = -1;
+                    while (console_input_1 != 0) {
+                        System.out.println("\nEnter 0 to quit\nEnter 1 to add a student\nEnter 2 to display students\n" +
+                                "Enter 3 to add an instructor\nEnter 4 to display instructors\n");
+                        console_input_1 = scanner.nextInt();
+                        switch (console_input_1) {
+                            case 0:
+                                break;
+                            case 1:
+                                System.out.println("Enter the student's name:");
+                                String student_name = scanner.nextLine();
+                                student_name = scanner.nextLine();
+                                service.CreateNewStudent(student_name);
+                                break;
+                            case 2:
+                                service.DisplayStudents();
+                                break;
+                            case 3:
+                                System.out.println("Enter the instructor's name:");
+                                String instructor_name = scanner.nextLine();
+                                instructor_name = scanner.nextLine();
+                                System.out.println("Enter the instructor's profession:");
+                                String profession = scanner.nextLine();
+                                service.CreateNewInstructor(instructor_name, profession);
+                                break;
+                            case 4:
+                                service.DisplayInstructors();
+                                break;
+                        }
+                    }
+                    break;
+                case 2:
+                    int console_input_2 = -1;
+                    while(console_input_2 != 0){
+                        System.out.println("Enter 0 to quit\nEnter 1 to add a course\nEnter 2 to display all courses\nEnter 3 to display a course's information" +
+                                "\nEnter 4 to assign a user to a course\n");
+                        console_input_2 = scanner.nextInt();
+                        int course_id;
+                        switch (console_input_2){
+                            case 0: break;
+                            case 1:
+                                System.out.println("Enter the course's name:");
+                                String course_name = scanner.nextLine();
+                                course_name = scanner.nextLine();
+                                System.out.println("Enter the course's category:");
+                                String course_categ = scanner.nextLine();
+                                System.out.println("Enter the amount of months the course spans:");
+                                int course_months = scanner.nextInt();
+                                service.CreateNewCourse(course_name, course_categ, course_months);
+                                break;
+                            case 2:
+                                service.DisplayCourses();
+                                break;
+                            case 3:
+                                System.out.println("Enter the course id:");
+                                course_id = scanner.nextInt();
+                                service.ShowCourseDetails(course_id);
+                                break;
+                            case 4:
+                                int console_input_2_3 = -1;
+                                System.out.println("\nEnter 1 to associate a student | 2 to associate an instructor\n");
+                                console_input_2_3 = scanner.nextInt();
+                                switch (console_input_2_3){
+                                    case 1:
+                                        System.out.println("Enter the student's id and the course's id:");
+                                        int student_id = scanner.nextInt();
+                                        course_id = scanner.nextInt();
+                                        service.AddStudentToCourse(student_id, course_id);
+                                        break;
+                                    case 2:
+                                        System.out.println("Enter the student's id and the course's id:");
+                                        int instructor_id = scanner.nextInt();
+                                        course_id = scanner.nextInt();
+                                        service.AddInstructorToCourse(instructor_id, course_id);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                        }
+                    }
+            }
+        }
     }
 }
