@@ -8,7 +8,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome!\n");
         while (console_input != 0) {
-            System.out.println("\nEnter 0 to quit\nEnter 1 to manage users\nEnter 2 to manage courses\n");
+            System.out.println("\nEnter 0 to quit\nEnter 1 to manage users\nEnter 2 to manage courses\nEnter 3 to manage grades");
             console_input = scanner.nextInt();
             switch (console_input) {
                 case 0:
@@ -17,7 +17,7 @@ public class Main {
                     int console_input_1 = -1;
                     while (console_input_1 != 0) {
                         System.out.println("\nEnter 0 to quit\nEnter 1 to add a student\nEnter 2 to display students\n" +
-                                "Enter 3 to add an instructor\nEnter 4 to display instructors\n");
+                                "Enter 3 to add an instructor\nEnter 4 to display instructors\nEnter 5 to display a student's info\n");
                         console_input_1 = scanner.nextInt();
                         switch (console_input_1) {
                             case 0:
@@ -42,6 +42,10 @@ public class Main {
                             case 4:
                                 service.DisplayInstructors();
                                 break;
+                            case 5:
+                                System.out.println("Enter the student's id:");
+                                int student_id = scanner.nextInt();
+                                service.ShowStudentDetails(student_id);
                         }
                     }
                     break;
@@ -52,8 +56,9 @@ public class Main {
                                 "\nEnter 4 to assign a user to a course\n");
                         console_input_2 = scanner.nextInt();
                         int course_id;
-                        switch (console_input_2){
-                            case 0: break;
+                        switch (console_input_2) {
+                            case 0:
+                                break;
                             case 1:
                                 System.out.println("Enter the course's name:");
                                 String course_name = scanner.nextLine();
@@ -76,7 +81,7 @@ public class Main {
                                 int console_input_2_3 = -1;
                                 System.out.println("\nEnter 1 to associate a student | 2 to associate an instructor\n");
                                 console_input_2_3 = scanner.nextInt();
-                                switch (console_input_2_3){
+                                switch (console_input_2_3) {
                                     case 1:
                                         System.out.println("Enter the student's id and the course's id:");
                                         int student_id = scanner.nextInt();
@@ -92,6 +97,31 @@ public class Main {
                                     default:
                                         break;
                                 }
+                        }
+                    }
+                    break;
+                case 3:
+                    int console_input_3 = -1;
+                    while (console_input_3 != 0){
+                        System.out.println("\nEnter 0 to return\nEnter 1 to add a grade to a student\n");
+                        console_input_3 = scanner.nextInt();
+                        switch (console_input_3){
+                            case 0:
+                                break;
+                            case 1:
+                                System.out.println("Enter the grade:");
+                                int grade = scanner.nextInt();
+                                System.out.println("Enter the maximum grade:");
+                                int max_grade = scanner.nextInt();
+                                System.out.println("Enter the associated course id:");
+                                int course_id = scanner.nextInt();
+                                System.out.println("Enter the student's id:");
+                                int student_id = scanner.nextInt();
+                                System.out.println("Enter details about the grade:");
+                                String note = scanner.nextLine();
+                                note = scanner.nextLine();
+                                service.AddGrade(grade, max_grade, course_id, student_id, note);
+                                break;
                         }
                     }
             }

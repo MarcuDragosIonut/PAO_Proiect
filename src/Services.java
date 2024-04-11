@@ -65,11 +65,31 @@ class Course implements Comparable<Course>{
 
 class Grade {
     private Course course;
-    private double grade;
+    private double grade, max_grade;
+    private String note;
 
-    public Grade(Course course, double grade) {
+    public Grade(Course course, double grade, double max_grade, String note) {
         this.course = course;
         this.grade = grade;
+        this.max_grade = max_grade;
+        this.note = note;
+    }
+
+    public Course getCourse() {
+        return course;
+    }
+
+    public double getGrade() {
+        return grade;
+    }
+
+    public void setGrade(double grade) {
+        this.grade = grade;
+    }
+
+    @Override
+    public String toString() {
+        return grade + "/" + max_grade;
     }
 }
 
@@ -159,10 +179,10 @@ abstract class Assessment {
 
 class Quiz extends Assessment {
     private boolean Timed;
-    private HashMap<Integer, String> question;
-    private HashMap<Integer, String[]> answers;
-    private HashMap<Integer, String> correct_answer;
-    private HashMap<Integer, Double> points;
+    private HashMap<Integer, String> question = new HashMap<Integer, String>();
+    private HashMap<Integer, Vector<String>> answers = new HashMap<Integer, Vector<String>>();
+    private HashMap<Integer, String> correct_answer = new HashMap<Integer, String>();
+    private HashMap<Integer, Double> points = new HashMap<Integer, Double>();
 
     public Quiz(String type, double max_grade, boolean timed) {
         super(type, max_grade);
@@ -334,6 +354,57 @@ public class Services {
                 }
             }
             System.out.println("\n");
+        }
+    }
+
+    public void ShowStudentDetails(int student_id){
+        int vector_student_id = course_bin_lookup(student_id);
+        if(vector_student_id == -1){
+            System.out.println("There is no student with the id " + student_id + "\n");
+        }
+        else{
+            Student student = students.elementAt(vector_student_id);
+            System.out.println(student_id + " " + student.getName() + " is enrolled in the following courses:\n");
+            for(var course : student.get_courses()){
+                System.out.println(course + " | grades: ");
+                for(var grade : student_grades.get(student)){
+                    if (grade.getCourse() == course) System.out.println(grade + " ");
+                }
+            }
+            System.out.println();
+        }
+    }
+
+    public void AddGrade(double grade, double max_grade, int course_id, int student_id, String note){
+        int vector_course_id = course_bin_lookup(course_id);
+        if(vector_course_id == -1){
+            System.out.println("There is no course with the id " + course_id + "\n");
+        }
+        else{
+            int vector_student_id = student_bin_lookup(student_id);
+            if(vector_student_id == -1){
+                System.out.println("There is no student with the id " + student_id + "\n");
+            }
+            else{
+                if(max_grade < grade){
+                    System.out.println("Invalid grade\n");
+                }
+                else{
+                    Course course = courses.elementAt(vector_course_id);
+                    Student student = students.elementAt(vector_student_id);
+                    Grade newgrade = new Grade(courses.elementAt(vector_course_id), grade, max_grade, note);
+                    if(student.get_courses().contains(course)){
+                        student_grades.putIfAbsent(student, new Vector<Grade>());
+                        Vector<Grade> old_vector = student_grades.get(student);
+                        old_vector.add(newgrade);
+                        student_grades.put(student, old_vector);
+                        System.out.println("The grade was successfully added\n");
+                    }
+                    else{
+                        System.out.println("The student isn't enrolled in this course\n");
+                    }
+                }
+            }
         }
     }
 
