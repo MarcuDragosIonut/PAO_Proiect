@@ -107,6 +107,10 @@ abstract class User {
         return name;
     }
 
+    public int getId(){
+        return user_id;
+    }
+
     public void setName(String new_username) {
         this.name = new_username;
     }
@@ -255,7 +259,7 @@ public class Services {
     private int student_bin_lookup(int s_id) {
         int L = 0, R = students.size() - 1, m = (R + L) / 2;
         while (L <= R) {
-            int c_id = students.elementAt(m).user_id;
+            int c_id = students.elementAt(m).getId();
             System.out.println(c_id + " " + s_id );
             if (s_id == c_id) {
                 return m;
@@ -288,7 +292,7 @@ public class Services {
     private int instructor_bin_lookup(int crs_id) {
         int L = 0, R = instructors.size() - 1, m = (R + L) / 2;
         while (L <= R) {
-            int c_id = courses.elementAt(m).getCourse_id();
+            int c_id = instructors.elementAt(m).getId();
             if (crs_id == c_id) {
                 return m;
             }
