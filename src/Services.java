@@ -1,6 +1,6 @@
 import java.util.*;
 
-class Course implements Comparable<Course>{
+class Course implements Comparable<Course> {
     private String course_name;
     private String category;
     private int months_duration;
@@ -107,7 +107,7 @@ abstract class User {
         return name;
     }
 
-    public int getId(){
+    public int getId() {
         return user_id;
     }
 
@@ -246,9 +246,9 @@ public class Services {
         }
     }
 
-    public void DisplayCourses(){
+    public void DisplayCourses() {
         System.out.println("\nList of courses:");
-        for(var course : courses){
+        for (var course : courses) {
             System.out.println(course);
         }
     }
@@ -260,7 +260,7 @@ public class Services {
         int L = 0, R = students.size() - 1, m = (R + L) / 2;
         while (L <= R) {
             int c_id = students.elementAt(m).getId();
-            System.out.println(c_id + " " + s_id );
+            System.out.println(c_id + " " + s_id);
             if (s_id == c_id) {
                 return m;
             }
@@ -314,8 +314,7 @@ public class Services {
             int vector_course_id = course_bin_lookup(course_id);
             if (vector_course_id == -1) {
                 System.out.println("The course with the id " + course_id + " doesn't exist\n");
-            }
-            else {
+            } else {
                 student.add_to_course(courses.elementAt(vector_course_id));
                 System.out.println("Succesfully added!\n");
             }
@@ -327,33 +326,33 @@ public class Services {
         if (vector_instructor_id == -1) {
             System.out.println("The sinstructor with the id " + instructor_id + " doesn't exist\n");
         } else {
-            Student student = students.elementAt(vector_instructor_id);
+            Instructor instructor = instructors.elementAt(vector_instructor_id);
             int vector_course_id = course_bin_lookup(course_id);
             if (vector_course_id == -1) {
                 System.out.println("The course with the id " + course_id + " doesn't exist\n");
-            }
-            else {
-                student.add_to_course(courses.elementAt(vector_course_id));
+            } else {
+                Course course = courses.elementAt(vector_course_id);
+                instructor.add_to_course(course);
+                course.add_instructor(instructor);
                 System.out.println("Succesfully added!\n");
             }
         }
     }
 
-    public void ShowCourseDetails(int course_id){
+    public void ShowCourseDetails(int course_id) {
         int vector_course_id = course_bin_lookup(course_id);
-        if(vector_course_id == -1){
+        if (vector_course_id == -1) {
             System.out.println("There is no course with the id " + course_id + "\n");
-        }
-        else{
+        } else {
             Course course = courses.elementAt(vector_course_id);
             System.out.println(course_id + " " + course.getCourse_name() + ", Category: " + course.getCategory());
             System.out.println("Instructors: ");
-            for(var instructor : course.get_instructors()){
+            for (var instructor : course.get_instructors()) {
                 System.out.println(instructor);
             }
             System.out.println("Students: ");
-            for(var student : students){
-                if(student.get_courses().contains(course)){
+            for (var student : students) {
+                if (student.get_courses().contains(course)) {
                     System.out.println(student);
                 }
             }
@@ -361,17 +360,16 @@ public class Services {
         }
     }
 
-    public void ShowStudentDetails(int student_id){
+    public void ShowStudentDetails(int student_id) {
         int vector_student_id = course_bin_lookup(student_id);
-        if(vector_student_id == -1){
+        if (vector_student_id == -1) {
             System.out.println("There is no student with the id " + student_id + "\n");
-        }
-        else{
+        } else {
             Student student = students.elementAt(vector_student_id);
             System.out.println(student_id + " " + student.getName() + " is enrolled in the following courses:\n");
-            for(var course : student.get_courses()){
+            for (var course : student.get_courses()) {
                 System.out.println(course + " | grades: ");
-                for(var grade : student_grades.get(student)){
+                for (var grade : student_grades.get(student)) {
                     if (grade.getCourse() == course) System.out.println(grade + " ");
                 }
             }
@@ -379,32 +377,28 @@ public class Services {
         }
     }
 
-    public void AddGrade(double grade, double max_grade, int course_id, int student_id, String note){
+    public void AddGrade(double grade, double max_grade, int course_id, int student_id, String note) {
         int vector_course_id = course_bin_lookup(course_id);
-        if(vector_course_id == -1){
+        if (vector_course_id == -1) {
             System.out.println("There is no course with the id " + course_id + "\n");
-        }
-        else{
+        } else {
             int vector_student_id = student_bin_lookup(student_id);
-            if(vector_student_id == -1){
+            if (vector_student_id == -1) {
                 System.out.println("There is no student with the id " + student_id + "\n");
-            }
-            else{
-                if(max_grade < grade){
+            } else {
+                if (max_grade < grade) {
                     System.out.println("Invalid grade\n");
-                }
-                else{
+                } else {
                     Course course = courses.elementAt(vector_course_id);
                     Student student = students.elementAt(vector_student_id);
                     Grade newgrade = new Grade(courses.elementAt(vector_course_id), grade, max_grade, note);
-                    if(student.get_courses().contains(course)){
+                    if (student.get_courses().contains(course)) {
                         student_grades.putIfAbsent(student, new Vector<Grade>());
                         Vector<Grade> old_vector = student_grades.get(student);
                         old_vector.add(newgrade);
                         student_grades.put(student, old_vector);
                         System.out.println("The grade was successfully added\n");
-                    }
-                    else{
+                    } else {
                         System.out.println("The student isn't enrolled in this course\n");
                     }
                 }

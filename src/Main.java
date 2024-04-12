@@ -16,7 +16,7 @@ public class Main {
                 case 1:
                     int console_input_1 = -1;
                     while (console_input_1 != 0) {
-                        System.out.println("\nEnter 0 to quit\nEnter 1 to add a student\nEnter 2 to display students\n" +
+                        System.out.println("\nEnter 0 to return\nEnter 1 to add a student\nEnter 2 to display students\n" +
                                 "Enter 3 to add an instructor\nEnter 4 to display instructors\nEnter 5 to display a student's info\n");
                         console_input_1 = scanner.nextInt();
                         switch (console_input_1) {
@@ -52,7 +52,7 @@ public class Main {
                 case 2:
                     int console_input_2 = -1;
                     while(console_input_2 != 0){
-                        System.out.println("Enter 0 to quit\nEnter 1 to add a course\nEnter 2 to display all courses\nEnter 3 to display a course's information" +
+                        System.out.println("Enter 0 to return\nEnter 1 to add a course\nEnter 2 to display all courses\nEnter 3 to display a course's information" +
                                 "\nEnter 4 to assign a user to a course\n");
                         console_input_2 = scanner.nextInt();
                         int course_id;
@@ -89,7 +89,7 @@ public class Main {
                                         service.AddStudentToCourse(student_id, course_id);
                                         break;
                                     case 2:
-                                        System.out.println("Enter the student's id and the course's id:");
+                                        System.out.println("Enter the instructor's id and the course's id:");
                                         int instructor_id = scanner.nextInt();
                                         course_id = scanner.nextInt();
                                         service.AddInstructorToCourse(instructor_id, course_id);
