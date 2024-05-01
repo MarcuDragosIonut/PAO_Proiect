@@ -1,4 +1,5 @@
 import Services.Services;
+
 import java.util.Scanner;
 
 public class Main {
@@ -9,7 +10,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome!\n");
         while (console_input != 0) {
-            System.out.println("\nEnter 0 to quit\nEnter 1 to manage users\nEnter 2 to manage courses\nEnter 3 to manage grades");
+            System.out.println("\nEnter 0 to quit\nEnter 1 to manage users\nEnter 2 to manage courses\nEnter 3 to manage grades\nEnter 4 to manage assessments");
             console_input = scanner.nextInt();
             switch (console_input) {
                 case 0:
@@ -52,7 +53,7 @@ public class Main {
                     break;
                 case 2:
                     int console_input_2 = -1;
-                    while(console_input_2 != 0){
+                    while (console_input_2 != 0) {
                         System.out.println("Enter 0 to return\nEnter 1 to add a course\nEnter 2 to display all courses\nEnter 3 to display a course's information" +
                                 "\nEnter 4 to assign a user to a course\n");
                         console_input_2 = scanner.nextInt();
@@ -103,10 +104,10 @@ public class Main {
                     break;
                 case 3:
                     int console_input_3 = -1;
-                    while (console_input_3 != 0){
+                    while (console_input_3 != 0) {
                         System.out.println("\nEnter 0 to return\nEnter 1 to add a grade to a student\n");
                         console_input_3 = scanner.nextInt();
-                        switch (console_input_3){
+                        switch (console_input_3) {
                             case 0:
                                 break;
                             case 1:
@@ -122,6 +123,43 @@ public class Main {
                                 String note = scanner.nextLine();
                                 note = scanner.nextLine();
                                 service.AddGrade(grade, max_grade, course_id, student_id, note);
+                                break;
+                        }
+                    }
+                case 4:
+                    int console_input_4 = -1;
+                    while (console_input_4 != 0) {
+                        System.out.println("\nEnter 0 to return\nEnter 1 to add a quiz\nEnter 2 to add a project\n");
+                        console_input_4 = scanner.nextInt();
+                        String name="", description="";
+                        int course_id = -1;
+                        if(console_input_4 == 1 || console_input_4 == 2){
+                            System.out.println("Name:");
+                            name = scanner.nextLine();
+                            name = scanner.nextLine();
+                            System.out.println("Description:");
+                            description = scanner.nextLine();
+                        }
+                        switch (console_input_4) {
+                            case 0:
+                                break;
+                            case 1:
+                                System.out.println("Number of questions:");
+                                int nr_q = scanner.nextInt();
+                                System.out.println("Quiz time limit (in minutes):");
+                                int time_lim = scanner.nextInt();
+                                System.out.println("Quiz's course id:");
+                                course_id = scanner.nextInt();
+                                service.AddQuiz(name, description, nr_q, time_lim, course_id);
+                                break;
+                            case 2:
+                                System.out.println("Deadline date (format: yyyy-mm-dd):");
+                                String date = scanner.nextLine();
+                                System.out.println("Deadline hour (format: hh-mm):");
+                                String hour = scanner.nextLine();
+                                System.out.println("Quiz's course id:");
+                                course_id = scanner.nextInt();
+                                service.AddProject(name, description, date, hour, course_id);
                                 break;
                         }
                     }

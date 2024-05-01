@@ -1,12 +1,11 @@
 package Course;
 
-abstract class Assessment {
+public abstract class Assessment {
     protected String name;
-    protected double max_grade;
+    protected  String description;
 
-    public Assessment(String type, double max_grade) {
-        this.name = type;
-        this.max_grade = max_grade;
+    public Assessment(String name, String description) {
+        this.name = name;
     }
 
 }

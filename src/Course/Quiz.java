@@ -3,19 +3,35 @@ package Course;
 import java.util.HashMap;
 import java.util.Vector;
 
-class Quiz extends Assessment {
-    private boolean Timed;
-    private HashMap<Integer, String> question = new HashMap<Integer, String>();
-    private HashMap<Integer, Vector<String>> answers = new HashMap<Integer, Vector<String>>();
-    private HashMap<Integer, String> correct_answer = new HashMap<Integer, String>();
-    private HashMap<Integer, Double> points = new HashMap<Integer, Double>();
+public class Quiz extends Assessment {
+    private int Time; // in minute
+    private int Number_of_questions;
 
-    public Quiz(String type, double max_grade, boolean timed) {
-        super(type, max_grade);
-        Timed = timed;
+    public Quiz(String name, String description, int nr_questions, int time) {
+        super(name, description);
+        Time = time;
+        Number_of_questions = nr_questions;
     }
 
-    public Quiz(String type, double max_grade, int number_of_questions) {
-        super(type, max_grade);
+    public Quiz(String name, String description, int nr_questions) {
+        super(name, description);
+        Time = 0;
+        Number_of_questions = nr_questions;
+    }
+
+    public int getTime() {
+        return Time;
+    }
+
+    public void setTime(int time) {
+        Time = time;
+    }
+
+    public int getNumber_of_questions() {
+        return Number_of_questions;
+    }
+
+    public void setNumber_of_questions(int number_of_questions) {
+        Number_of_questions = number_of_questions;
     }
 }

@@ -1,19 +1,20 @@
 package Services;
 
-import Course.Course;
-import Course.Grade;
+import Course.*;
 import User.Instructor;
 import User.Student;
 
+import javax.swing.*;
 import java.util.*;
 
 public class Services {
 
 
-    private static Vector<Student> students = new Vector<Student>();
-    private static Vector<Instructor> instructors = new Vector<Instructor>();
-    private static Vector<Course> courses = new Vector<Course>();
-    private static HashMap<Student, Vector<Grade>> student_grades = new HashMap<Student, Vector<Grade>>();
+    private static final Vector<Student> students = new Vector<Student>();
+    private static final Vector<Instructor> instructors = new Vector<Instructor>();
+    private static final Vector<Course> courses = new Vector<Course>();
+    private static final HashMap<Student, Vector<Grade>> student_grades = new HashMap<Student, Vector<Grade>>();
+    private static final HashMap<Course, Vector<Assessment>> course_assessments = new HashMap<Course, Vector<Assessment>>();
 
     public void CreateNewStudent(String name) {
         Student new_student = new Student(name);
@@ -202,6 +203,32 @@ public class Services {
                     }
                 }
             }
+        }
+    }
+
+    public void AddQuiz(String name, String description, int number_of_questions, int time_limit, int course_id){
+        Quiz quiz = new Quiz(name, description, number_of_questions, time_limit);
+        int vector_course_id = course_bin_lookup(course_id);
+        AddAssessment(course_id, vector_course_id, quiz);
+    }
+
+    public void AddProject(String name, String description, String date, String hour, int course_id){
+        Project project = new Project(name, description,date, hour);
+        int vector_course_id = course_bin_lookup(course_id);
+        AddAssessment(course_id, vector_course_id, project);
+    }
+
+    private static void AddAssessment(int course_id, int vector_course_id, Assessment project) {
+        if(vector_course_id == -1){
+            System.out.println("There is no course with the id " + course_id + "\n");
+        }
+        else{
+            Course course = courses.elementAt(vector_course_id);
+            course_assessments.putIfAbsent(course, new Vector<Assessment>());
+            Vector<Assessment> old_vector = course_assessments.get(course);
+            old_vector.add(project);
+            course_assessments.put(course, old_vector);
+            System.out.println("The quiz has been successfully added\n");
         }
     }
 
