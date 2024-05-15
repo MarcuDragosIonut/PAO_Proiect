@@ -18,7 +18,16 @@ public class Course implements Comparable<Course> {
         this.months_duration = months_duration;
         this.course_id = ++number_of_courses;
     }
+    public Course(int course_id, String course_name, String category, int months_duration) {
+        this.course_name = course_name;
+        this.category = category;
+        this.months_duration = months_duration;
+        this.course_id = course_id;
+    }
 
+    public static void setNumber_of_courses(int nr){
+        number_of_courses = nr;
+    }
     public String getCourse_name() {
         return course_name;
     }

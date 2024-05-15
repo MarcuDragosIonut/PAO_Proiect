@@ -2,10 +2,13 @@ package Course;
 
 public abstract class Assessment {
     protected String name;
-    protected  String description;
 
-    public Assessment(String name, String description) {
+    public Assessment(String name) {
         this.name = name;
+    }
+
+    public String getName(){
+        return name;
     }
 
 }

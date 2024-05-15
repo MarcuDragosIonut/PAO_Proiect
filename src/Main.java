@@ -1,11 +1,15 @@
-import Services.Services;
+import Services.*;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class Main {
     static Services service = new Services();
+    public static void main(String[] args) throws SQLException, IOException {
 
-    public static void main(String[] args) {
+        LoadDB.load_DB();
+
         int console_input = -1;
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome!\n");
@@ -126,6 +130,7 @@ public class Main {
                                 break;
                         }
                     }
+                    break;
                 case 4:
                     int console_input_4 = -1;
                     while (console_input_4 != 0) {
@@ -137,8 +142,6 @@ public class Main {
                             System.out.println("Name:");
                             name = scanner.nextLine();
                             name = scanner.nextLine();
-                            System.out.println("Description:");
-                            description = scanner.nextLine();
                         }
                         switch (console_input_4) {
                             case 0:
@@ -150,20 +153,23 @@ public class Main {
                                 int time_lim = scanner.nextInt();
                                 System.out.println("Quiz's course id:");
                                 course_id = scanner.nextInt();
-                                service.AddQuiz(name, description, nr_q, time_lim, course_id);
+                                service.AddQuiz(name, nr_q, time_lim, course_id);
                                 break;
                             case 2:
                                 System.out.println("Deadline date (format: yyyy-mm-dd):");
                                 String date = scanner.nextLine();
-                                System.out.println("Deadline hour (format: hh-mm):");
+                                System.out.println("Deadline hour (format: hh:mm):");
                                 String hour = scanner.nextLine();
                                 System.out.println("Quiz's course id:");
                                 course_id = scanner.nextInt();
-                                service.AddProject(name, description, date, hour, course_id);
+                                service.AddProject(name, date, hour, course_id);
                                 break;
                         }
                     }
+                    break;
             }
         }
+        service.close_connection();
+        service.close_file();
     }
 }

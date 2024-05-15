@@ -10,6 +10,10 @@ public class Instructor extends User {
         super(_name);
         this.profession = profession;
     }
+    public Instructor(int _id, String _name, String profession) {
+        super(_id, _name);
+        this.profession = profession;
+    }
 
     public void add_to_course(Course.Course course) {
         teaching_courses.add(course);

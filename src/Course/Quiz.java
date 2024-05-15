@@ -7,14 +7,14 @@ public class Quiz extends Assessment {
     private int Time; // in minute
     private int Number_of_questions;
 
-    public Quiz(String name, String description, int nr_questions, int time) {
-        super(name, description);
+    public Quiz(String name, int nr_questions, int time) {
+        super(name);
         Time = time;
         Number_of_questions = nr_questions;
     }
 
-    public Quiz(String name, String description, int nr_questions) {
-        super(name, description);
+    public Quiz(String name, int nr_questions) {
+        super(name);
         Time = 0;
         Number_of_questions = nr_questions;
     }
