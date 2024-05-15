@@ -1,8 +1,7 @@
 package Services;
 
 import Course.*;
-import User.Instructor;
-import User.Student;
+import User.*;
 
 import javax.swing.*;
 import java.io.FileWriter;
@@ -108,10 +107,21 @@ public class Services {
         }
     }
 
-    public int student_bin_lookup(int s_id) {
-        int L = 0, R = students.size() - 1, m = (R + L) / 2;
+    public int bin_lookup(int s_id, Vector<?> v) {
+        var vfe = v.firstElement();
+        int L = 0, R = (vfe instanceof Student) ? students.size() -1 : (vfe instanceof Instructor ? instructors.size() - 1 : courses.size() - 1);
+        int m = (R + L) / 2;
         while (L <= R) {
-            int c_id = students.elementAt(m).getId();
+            int c_id = 0;// students.elementAt(m).getId();
+            if(vfe instanceof Student){
+                c_id = ((Vector<Student>) v).elementAt(m).getId();
+            }
+            else if(vfe instanceof Instructor){
+                c_id = ((Vector<Instructor>) v).elementAt(m).getId();
+            }
+            else if(vfe instanceof Course){
+                c_id = ((Vector<Course>) v).elementAt(m).getCourse_id();
+            }
             if (s_id == c_id) {
                 return m;
             }
@@ -126,49 +136,15 @@ public class Services {
         return -1;
     }
 
-    public int course_bin_lookup(int crs_id) {
-        int L = 0, R = courses.size() - 1, m = (R + L) / 2;
-        while (L <= R) {
-            int c_id = courses.elementAt(m).getCourse_id();
-            if (crs_id == c_id) {
-                return m;
-            }
-            if (crs_id < c_id) {
-                R = m - 1;
-                m = (R + L) / 2;
-            } else {
-                L = m + 1;
-                m = (R + L) / 2;
-            }
-        }
-        return -1;
-    }
 
-    public int instructor_bin_lookup(int crs_id) {
-        int L = 0, R = instructors.size() - 1, m = (R + L) / 2;
-        while (L <= R) {
-            int c_id = instructors.elementAt(m).getId();
-            if (crs_id == c_id) {
-                return m;
-            }
-            if (crs_id < c_id) {
-                R = m - 1;
-                m = (R + L) / 2;
-            } else {
-                L = m + 1;
-                m = (R + L) / 2;
-            }
-        }
-        return -1;
-    }
 
     public void AddStudentToCourse(int student_id, int course_id) throws SQLException, IOException {
-        int vector_student_id = student_bin_lookup(student_id);
+        int vector_student_id = bin_lookup(student_id, students);
         if (vector_student_id == -1) {
             System.out.println("The student with the id " + student_id + " doesn't exist\n");
         } else {
             Student student = students.elementAt(vector_student_id);
-            int vector_course_id = course_bin_lookup(course_id);
+            int vector_course_id = bin_lookup(course_id, courses);
             if (vector_course_id == -1) {
                 System.out.println("The course with the id " + course_id + " doesn't exist\n");
             } else {
@@ -186,12 +162,12 @@ public class Services {
     }
 
     public void AddInstructorToCourse(int instructor_id, int course_id) throws SQLException, IOException {
-        int vector_instructor_id = instructor_bin_lookup(instructor_id);
+        int vector_instructor_id = bin_lookup(instructor_id, instructors);
         if (vector_instructor_id == -1) {
             System.out.println("The instructor with the id " + instructor_id + " doesn't exist\n");
         } else {
             Instructor instructor = instructors.elementAt(vector_instructor_id);
-            int vector_course_id = course_bin_lookup(course_id);
+            int vector_course_id = bin_lookup(course_id, courses);
             if (vector_course_id == -1) {
                 System.out.println("The course with the id " + course_id + " doesn't exist\n");
             } else {
@@ -211,7 +187,7 @@ public class Services {
     }
 
     public void ShowCourseDetails(int course_id) {
-        int vector_course_id = course_bin_lookup(course_id);
+        int vector_course_id = bin_lookup(course_id, courses);
         if (vector_course_id == -1) {
             System.out.println("There is no course with the id " + course_id + "\n");
         } else {
@@ -228,13 +204,15 @@ public class Services {
                 }
             }
             System.out.println("Assessments: ");
-            for (var assessment : course_assessments.get(course)) {
-                if (assessment instanceof Project) {
-                    System.out.println(assessment.getName() + " " + ((Project) assessment).Get_deadline());
-                }
-                if (assessment instanceof Quiz) {
-                    System.out.println(assessment.getName() + " minutes: " + ((Quiz) assessment).getTime()
-                            + "\nnumber of questions: " + ((Quiz) assessment).getNumber_of_questions());
+            if(course_assessments.containsKey(course)) {
+                for (var assessment : course_assessments.get(course)) {
+                    if (assessment instanceof Project) {
+                        System.out.println(assessment.getName() + " " + ((Project) assessment).Get_deadline());
+                    }
+                    if (assessment instanceof Quiz) {
+                        System.out.println(assessment.getName() + " minutes: " + ((Quiz) assessment).getTime()
+                                + "\nnumber of questions: " + ((Quiz) assessment).getNumber_of_questions());
+                    }
                 }
             }
             System.out.println("\n");
@@ -242,7 +220,7 @@ public class Services {
     }
 
     public void ShowStudentDetails(int student_id) {
-        int vector_student_id = student_bin_lookup(student_id);
+        int vector_student_id = bin_lookup(student_id, students);
         if (vector_student_id == -1) {
             System.out.println("There is no student with the id " + student_id + "\n");
         } else {
@@ -260,11 +238,11 @@ public class Services {
     }
 
     public void AddGrade(double grade, double max_grade, int course_id, int student_id, String note) throws SQLException, IOException {
-        int vector_course_id = course_bin_lookup(course_id);
+        int vector_course_id = bin_lookup(course_id, courses);
         if (vector_course_id == -1) {
             System.out.println("There is no course with the id " + course_id + "\n");
         } else {
-            int vector_student_id = student_bin_lookup(student_id);
+            int vector_student_id = bin_lookup(student_id, students);
             if (vector_student_id == -1) {
                 System.out.println("There is no student with the id " + student_id + "\n");
             } else {
@@ -291,9 +269,9 @@ public class Services {
     }
 
     public void AddDBGrade(double grade_score, double max_grade_score, String note, int course_id, int student_id) {
-        Course grade_course = courses.elementAt(course_bin_lookup(course_id));
+        Course grade_course = courses.elementAt(bin_lookup(course_id, courses));
         Grade grade = new Grade(grade_course, grade_score, max_grade_score, note);
-        int vector_student_id = student_bin_lookup(student_id);
+        int vector_student_id = bin_lookup(student_id, students);
         Student student = students.elementAt(vector_student_id);
         student_grades.putIfAbsent(student, new Vector<Grade>());
         Vector<Grade> old_vector = student_grades.get(student);
@@ -303,36 +281,41 @@ public class Services {
 
     public void AddQuiz(String name, int number_of_questions, int time_limit, int course_id) throws SQLException, IOException {
         Quiz quiz = new Quiz(name, number_of_questions, time_limit);
-        int vector_course_id = course_bin_lookup(course_id);
-        AddAssessment(course_id, vector_course_id, quiz);
-        Statement stmt = con.createStatement();
-        stmt.executeUpdate("INSERT INTO ASSESSMENT (name, course_id) VALUES('" + name + "', " + course_id + ")");
-        fw.append("INSERT INTO ASSESSMENT, " + LocalDateTime.now().format(dt_frmt) + '\n');
-        ResultSet rs = stmt.executeQuery("SELECT MAX(ASSESSMENT_ID) FROM ASSESSMENT");
-        fw.append("SELECT FROM ASSESSMENT, " + LocalDateTime.now().format(dt_frmt) + '\n');
-        rs.next();
-        stmt.executeUpdate("INSERT INTO QUIZ VALUES (" + rs.getInt(1) + ", " + time_limit
-                + ", " + number_of_questions + ")");
-        fw.append("INSERT INTO QUIZ, " + LocalDateTime.now().format(dt_frmt) + '\n');
+        int vector_course_id = bin_lookup(course_id, courses);
+        if(vector_course_id != -1) {
+            AddAssessment(course_id, quiz);
+            Statement stmt = con.createStatement();
+            stmt.executeUpdate("INSERT INTO ASSESSMENT (name, course_id) VALUES('" + name + "', " + course_id + ")");
+            fw.append("INSERT INTO ASSESSMENT, " + LocalDateTime.now().format(dt_frmt) + '\n');
+            ResultSet rs = stmt.executeQuery("SELECT MAX(ASSESSMENT_ID) FROM ASSESSMENT");
+            fw.append("SELECT FROM ASSESSMENT, " + LocalDateTime.now().format(dt_frmt) + '\n');
+            rs.next();
+            stmt.executeUpdate("INSERT INTO QUIZ VALUES (" + rs.getInt(1) + ", " + time_limit
+                    + ", " + number_of_questions + ")");
+            fw.append("INSERT INTO QUIZ, " + LocalDateTime.now().format(dt_frmt) + '\n');
+        }
     }
 
     public void AddProject(String name, String date, String hour, int course_id) throws SQLException, IOException {
         Project project = new Project(name, date, hour);
-        int vector_course_id = course_bin_lookup(course_id);
-        AddAssessment(course_id, vector_course_id, project);
-        Statement stmt = con.createStatement();
-        stmt.executeUpdate("INSERT INTO ASSESSMENT (name, course_id) VALUES('" + name + "', " + course_id + ")");
-        fw.append("INSERT INTO ASSESSMENT, " + LocalDateTime.now().format(dt_frmt) + '\n');
-        ResultSet rs = stmt.executeQuery("SELECT MAX(ASSESSMENT_ID) FROM ASSESSMENT");
-        fw.append("SELECT FROM ASSESSMENT, " + LocalDateTime.now().format(dt_frmt) + '\n');
-        rs.next();
-        stmt.executeUpdate("INSERT INTO PROJECT VALUES (" + rs.getInt(1) +
-                ", TO_DATE('" + date + " " + hour + "','yyyy-mm-dd hh24:mi'))");
-        fw.append("INSERT INTO PROJECT, " + LocalDateTime.now().format(dt_frmt) + '\n');
+        int vector_course_id = bin_lookup(course_id, courses);
+        if(vector_course_id != -1) {
+            AddAssessment(course_id, project);
+            Statement stmt = con.createStatement();
+            stmt.executeUpdate("INSERT INTO ASSESSMENT (name, course_id) VALUES('" + name + "', " + course_id + ")");
+            fw.append("INSERT INTO ASSESSMENT, " + LocalDateTime.now().format(dt_frmt) + '\n');
+            ResultSet rs = stmt.executeQuery("SELECT MAX(ASSESSMENT_ID) FROM ASSESSMENT");
+            fw.append("SELECT FROM ASSESSMENT, " + LocalDateTime.now().format(dt_frmt) + '\n');
+            rs.next();
+            stmt.executeUpdate("INSERT INTO PROJECT VALUES (" + rs.getInt(1) +
+                    ", TO_DATE('" + date + " " + hour + "','yyyy-mm-dd hh24:mi'))");
+            fw.append("INSERT INTO PROJECT, " + LocalDateTime.now().format(dt_frmt) + '\n');
+        }
 
     }
 
-    public void AddAssessment(int course_id, int vector_course_id, Assessment assessment) {
+    public void AddAssessment(int course_id, Assessment assessment) {
+        int vector_course_id = bin_lookup(course_id, courses);
         if (vector_course_id == -1) {
             System.out.println("There is no course with the id " + course_id + "\n");
         } else {

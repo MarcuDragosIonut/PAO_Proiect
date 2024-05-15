@@ -51,7 +51,7 @@ public class LoadDB {
         while(rs.next()){
             Quiz quiz = new Quiz(rs.getString("name"),
                     rs.getInt("quiz_time"), rs.getInt("nr_questions"));
-            service.AddAssessment(rs.getInt("course_id"), service.course_bin_lookup(rs.getInt("course_id")), quiz);
+            service.AddAssessment(rs.getInt("course_id"), quiz);
         }
 
         rs = stmt.executeQuery("SELECT name, course_id, deadline" +
@@ -60,7 +60,7 @@ public class LoadDB {
             String project_date = rs.getDate("deadline").toString();
             String project_hour = rs.getTime("deadline").toString();
             Project project = new Project(rs.getString("name") ,project_date, project_hour);
-            service.AddAssessment(rs.getInt("course_id"), service.course_bin_lookup(rs.getInt("course_id")), project);
+            service.AddAssessment(rs.getInt("course_id"), project);
         }
         rs = stmt.executeQuery("SELECT * FROM GRADE");
         while(rs.next()){
