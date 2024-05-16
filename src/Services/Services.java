@@ -327,6 +327,60 @@ public class Services {
         }
     }
 
+    public void deleteUser(int user_id) throws SQLException, IOException {
+        Statement stmt = con.createStatement();
+        int vector_id = bin_lookup(user_id, students);
+        if(vector_id == -1) { // adica e instructor sau nu exista
+            vector_id = bin_lookup(user_id, instructors);
+            if (vector_id == -1){ // userul nu exista
+                System.out.println("User-ul nu exista!\n");
+                return;
+            }
+
+            stmt.executeUpdate("DELETE FROM INSTRUCTOR WHERE USER_ID = " + user_id);
+            fw.append("DELETE FROM INSTRUCTOR, "+LocalDateTime.now().format(dt_frmt));
+
+            Instructor instructor_rem = instructors.elementAt(vector_id);
+            for(var course:courses){
+                course.remove_instructor(instructor_rem);
+            }
+            instructors.remove(instructor_rem);
+        }
+        else{ // adica e student
+            Student student_rem = students.elementAt(vector_id);
+
+            stmt.executeUpdate("DELETE FROM GRADE WHERE USER_ID = " + user_id);
+            fw.append("DELETE FROM GRADE, "+LocalDateTime.now().format(dt_frmt));
+
+            student_grades.remove(student_rem);
+            students.remove(student_rem);
+        }
+
+        stmt.executeUpdate("DELETE FROM USER_COURSE WHERE USER_ID = " + user_id);
+        fw.append("DELETE FROM GRADE, "+LocalDateTime.now().format(dt_frmt));
+
+        stmt.executeUpdate("DELETE FROM APP_USER WHERE USER_ID = " + user_id);
+        fw.append("DELETE FROM APP_USER, "+LocalDateTime.now().format(dt_frmt));
+    }
+
+    public void renameUser(int user_id, String newname) throws SQLException, IOException {
+        Statement stmt = con.createStatement();
+        int vector_id = bin_lookup(user_id, students);
+        if(vector_id == -1){
+            vector_id = bin_lookup(user_id, instructors);
+            if(vector_id == -1){
+                System.out.println("User-ul nu exista!\n");
+                return;
+            }
+            instructors.elementAt(vector_id).setName(newname);
+        }
+        else{
+            students.elementAt(vector_id).setName(newname);
+        }
+        stmt.executeUpdate("UPDATE APP_USER SET USER_NAME = '" + newname +"' WHERE USER_ID = " + user_id);
+        fw.append("UPDATED APP_USER, " + LocalDateTime.now().format(dt_frmt));
+    }
+
     public void close_connection() throws SQLException {
         con.close();
     }

@@ -20,10 +20,12 @@ public class Main {
                 case 0:
                     break;
                 case 1:
-                    int console_input_1 = -1;
+                    int console_input_1 = -1, user_id;
                     while (console_input_1 != 0) {
                         System.out.println("\nEnter 0 to return\nEnter 1 to add a student\nEnter 2 to display students\n" +
-                                "Enter 3 to add an instructor\nEnter 4 to display instructors\nEnter 5 to display a student's info\n");
+                                "Enter 3 to add an instructor\nEnter 4 to display instructors\n" +
+                                "Enter 5 to display a student's info\nEnter 6 to delete a user\n" +
+                                "Enter 7 to change a user's name\n");
                         console_input_1 = scanner.nextInt();
                         switch (console_input_1) {
                             case 0:
@@ -52,6 +54,20 @@ public class Main {
                                 System.out.println("Enter the student's id:");
                                 int student_id = scanner.nextInt();
                                 service.ShowStudentDetails(student_id);
+                                break;
+                            case 6:
+                                System.out.println("Enter the user's id:");
+                                user_id = scanner.nextInt();
+                                service.deleteUser(user_id);
+                                break;
+                            case 7:
+                                System.out.println("Enter the user's id:");
+                                user_id = scanner.nextInt();
+                                System.out.println("Enter a new name:");
+                                String newname = scanner.nextLine();
+                                newname = scanner.nextLine();
+                                service.renameUser(user_id, newname);
+                                break;
                         }
                     }
                     break;
@@ -103,6 +119,7 @@ public class Main {
                                     default:
                                         break;
                                 }
+                                break;
                         }
                     }
                     break;
