@@ -24,17 +24,6 @@ public class Services {
         }
     }
 
-    private static final DateTimeFormatter dt_frmt = DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy");
-    private static final FileWriter fw;
-
-    static {
-        try {
-            fw = new FileWriter("src/audit.csv", true);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 
     private static final Vector<Student> students = new Vector<Student>();
     private static final Vector<Instructor> instructors = new Vector<Instructor>();
@@ -48,8 +37,7 @@ public class Services {
         students.add(new_student);
         Statement stmt = con.createStatement();
         stmt.executeUpdate("INSERT INTO app_user VALUES(" + new_student.getId() + ", '" + name + "')");
-        fw.append("INSERT INTO APP_USER, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
-        fw.flush();
+        AuditService.audit_action("INSERT INTO APP_USER");
     }
 
     public void AddStudentFromDB(int id, String name) {
@@ -62,9 +50,9 @@ public class Services {
         instructors.add(new_instructor);
         Statement stmt = con.createStatement();
         stmt.executeUpdate("INSERT INTO app_user VALUES(" + new_instructor.getId() + ", '" + name + "')");
-        fw.append("INSERT INTO APP_USER, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
+        AuditService.audit_action("INSERT INTO APP_USER");
         stmt.executeUpdate("INSERT INTO instructor VALUES(" + new_instructor.getId() + ", '" + profession + "')");
-        fw.append("INSERT INTO INSTRUCTOR, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
+        AuditService.audit_action("INSERT INTO INSTRUCTOR");
 
     }
 
@@ -80,7 +68,7 @@ public class Services {
         Statement stmt = con.createStatement();
         stmt.executeUpdate("INSERT INTO course VALUES(" + new_course.getCourse_id() +
                 ", '" + category + "', " + num_of_months + ", '" + name + "')");
-        fw.append("INSERT INTO COURSE, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
+        AuditService.audit_action("INSERT INTO COURSE");
     }
 
     public void AddCourseFromDB(int id, String name, String category, int num_of_months) throws SQLException {
@@ -140,11 +128,11 @@ public class Services {
     private void addToUserCourseDB(int student_id, int course_id) throws SQLException, IOException {
         Statement stmt = con.createStatement();
         ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM USER_COURSE WHERE COURSE_ID = " + course_id + " AND USER_ID = " + student_id);
-        fw.append("SELECT FROM USER_COURSE, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
+        AuditService.audit_action("SELECT FROM USER_COURSE");
         rs.next();
         if (rs.getInt(1) == 0) {
             stmt.executeUpdate("INSERT INTO USER_COURSE VALUES(" + course_id + ", " + student_id + ")");
-            fw.append("INSERT INTO USER_COURSE, " + Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt) + '\n');
+            AuditService.audit_action("INSERT INTO USER_COURSE");
         }
     }
 
@@ -255,7 +243,7 @@ public class Services {
                         student_grades.put(student, old_vector);
                         Statement stmt = con.createStatement();
                         stmt.executeUpdate("INSERT INTO GRADE (grade_score, grade_max_score, note, course_id, user_id) VALUES(%f, %f, '%s', %d, %d)".formatted(grade, max_grade, note, course_id, student_id));
-                        fw.append("INSERT INTO GRADE, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
+                        AuditService.audit_action("INSERT INTO GRADE");
                     } else {
                         System.out.println("The student isn't enrolled in this course\n");
                     }
@@ -282,13 +270,13 @@ public class Services {
             AddAssessment(course_id, quiz);
             Statement stmt = con.createStatement();
             stmt.executeUpdate("INSERT INTO ASSESSMENT (name, course_id) VALUES('" + name + "', " + course_id + ")");
-            fw.append("INSERT INTO ASSESSMENT, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
+            AuditService.audit_action("INSERT INTO ASSESSMENT");
             ResultSet rs = stmt.executeQuery("SELECT MAX(ASSESSMENT_ID) FROM ASSESSMENT WHERE NAME = '" + name + "' AND COURSE_ID = " + course_id);
-            fw.append("SELECT FROM ASSESSMENT, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
+            AuditService.audit_action("SELECT FROM ASSESSMENT");
             rs.next();
             stmt.executeUpdate("INSERT INTO QUIZ VALUES (" + rs.getInt(1) + ", " + time_limit
                     + ", " + number_of_questions + ")");
-            fw.append("INSERT INTO QUIZ, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
+            AuditService.audit_action("INSERT INTO QUIZ");
         }
     }
 
@@ -299,13 +287,13 @@ public class Services {
             AddAssessment(course_id, project);
             Statement stmt = con.createStatement();
             stmt.executeUpdate("INSERT INTO ASSESSMENT (name, course_id) VALUES('" + name + "', " + course_id + ")");
-            fw.append("INSERT INTO ASSESSMENT, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
+            AuditService.audit_action("INSERT INTO ASSESSMENT");
             ResultSet rs = stmt.executeQuery("SELECT MAX(ASSESSMENT_ID) FROM ASSESSMENT WHERE NAME = '" + name + "' AND COURSE_ID = " + course_id);
-            fw.append("SELECT FROM ASSESSMENT, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
+            AuditService.audit_action("SELECT FROM ASSESSMENT");
             rs.next();
             stmt.executeUpdate("INSERT INTO PROJECT VALUES (" + rs.getInt(1) +
                     ", TO_DATE('" + date + " " + hour + "','yyyy-mm-dd hh24:mi'))");
-            fw.append("INSERT INTO PROJECT, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
+            AuditService.audit_action("INSERT INTO PROJECT");
         }
 
     }
@@ -334,7 +322,7 @@ public class Services {
             }
 
             stmt.executeUpdate("DELETE FROM INSTRUCTOR WHERE USER_ID = " + user_id);
-            fw.append("DELETE FROM INSTRUCTOR, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
+            AuditService.audit_action("DELETE FROM INSTRUCTOR");
 
             Instructor instructor_rem = instructors.elementAt(vector_id);
             for (var course : courses) {
@@ -345,17 +333,17 @@ public class Services {
             Student student_rem = students.elementAt(vector_id);
 
             stmt.executeUpdate("DELETE FROM GRADE WHERE USER_ID = " + user_id);
-            fw.append("DELETE FROM GRADE, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
+            AuditService.audit_action("DELETE FROM GRADE");
 
             student_grades.remove(student_rem);
             students.remove(student_rem);
         }
 
         stmt.executeUpdate("DELETE FROM USER_COURSE WHERE USER_ID = " + user_id);
-        fw.append("DELETE FROM GRADE, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
+        AuditService.audit_action("DELETE FROM GRADE");
 
         stmt.executeUpdate("DELETE FROM APP_USER WHERE USER_ID = " + user_id);
-        fw.append("DELETE FROM APP_USER, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
+        AuditService.audit_action("DELETE FROM APP_USER");
     }
 
     public void renameUser(int user_id, String newname) throws SQLException, IOException {
@@ -372,7 +360,7 @@ public class Services {
             students.elementAt(vector_id).setName(newname);
         }
         stmt.executeUpdate("UPDATE APP_USER SET USER_NAME = '" + newname + "' WHERE USER_ID = " + user_id);
-        fw.append("UPDATED APP_USER, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
+        AuditService.audit_action("UPDATED APP_USER");
     }
 
     public void renameCourse(int course_id, String newname) throws SQLException, IOException {
@@ -384,14 +372,11 @@ public class Services {
         }
         courses.elementAt(vector_id).setCourse_name(newname);
         stmt.executeUpdate("UPDATE COURSE SET COURSE_NAME = '" + newname + "' WHERE COURSE_ID = " + course_id);
-        fw.append("UPDATED COURSE, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
+        AuditService.audit_action("UPDATED COURSE");
     }
 
     public void close_connection() throws SQLException {
         con.close();
     }
 
-    public void close_file() throws IOException {
-        fw.close();
-    }
 }

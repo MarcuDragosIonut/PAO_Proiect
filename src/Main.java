@@ -195,6 +195,6 @@ public class Main {
             }
         }
         service.close_connection();
-        service.close_file();
+        AuditService.close_file();
     }
 }
