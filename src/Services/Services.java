@@ -338,7 +338,7 @@ public class Services {
             }
 
             stmt.executeUpdate("DELETE FROM INSTRUCTOR WHERE USER_ID = " + user_id);
-            fw.append("DELETE FROM INSTRUCTOR, "+LocalDateTime.now().format(dt_frmt));
+            fw.append("DELETE FROM INSTRUCTOR, "+LocalDateTime.now().format(dt_frmt) + '\n');
 
             Instructor instructor_rem = instructors.elementAt(vector_id);
             for(var course:courses){
@@ -350,17 +350,17 @@ public class Services {
             Student student_rem = students.elementAt(vector_id);
 
             stmt.executeUpdate("DELETE FROM GRADE WHERE USER_ID = " + user_id);
-            fw.append("DELETE FROM GRADE, "+LocalDateTime.now().format(dt_frmt));
+            fw.append("DELETE FROM GRADE, "+LocalDateTime.now().format(dt_frmt) + '\n');
 
             student_grades.remove(student_rem);
             students.remove(student_rem);
         }
 
         stmt.executeUpdate("DELETE FROM USER_COURSE WHERE USER_ID = " + user_id);
-        fw.append("DELETE FROM GRADE, "+LocalDateTime.now().format(dt_frmt));
+        fw.append("DELETE FROM GRADE, "+LocalDateTime.now().format(dt_frmt) + '\n');
 
         stmt.executeUpdate("DELETE FROM APP_USER WHERE USER_ID = " + user_id);
-        fw.append("DELETE FROM APP_USER, "+LocalDateTime.now().format(dt_frmt));
+        fw.append("DELETE FROM APP_USER, "+LocalDateTime.now().format(dt_frmt) + '\n');
     }
 
     public void renameUser(int user_id, String newname) throws SQLException, IOException {
@@ -378,7 +378,7 @@ public class Services {
             students.elementAt(vector_id).setName(newname);
         }
         stmt.executeUpdate("UPDATE APP_USER SET USER_NAME = '" + newname +"' WHERE USER_ID = " + user_id);
-        fw.append("UPDATED APP_USER, " + LocalDateTime.now().format(dt_frmt));
+        fw.append("UPDATED APP_USER, " + LocalDateTime.now().format(dt_frmt) + '\n');
     }
 
     public void close_connection() throws SQLException {
