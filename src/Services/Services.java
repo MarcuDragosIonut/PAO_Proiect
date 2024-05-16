@@ -46,7 +46,7 @@ public class Services {
         students.add(new_student);
         Statement stmt = con.createStatement();
         stmt.executeUpdate("INSERT INTO app_user VALUES(" + new_student.getId() + ", '" + name + "')");
-        fw.append("INSERT INTO APP_USER, " + LocalDateTime.now().format(dt_frmt) + '\n');
+        fw.append("INSERT INTO APP_USER, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
         fw.flush();
     }
 
@@ -60,9 +60,9 @@ public class Services {
         instructors.add(new_instructor);
         Statement stmt = con.createStatement();
         stmt.executeUpdate("INSERT INTO app_user VALUES(" + new_instructor.getId() + ", '" + name + "')");
-        fw.append("INSERT INTO APP_USER, " + LocalDateTime.now().format(dt_frmt) + '\n');
+        fw.append("INSERT INTO APP_USER, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
         stmt.executeUpdate("INSERT INTO instructor VALUES(" + new_instructor.getId() + ", '" + profession + "')");
-        fw.append("INSERT INTO INSTRUCTOR, " + LocalDateTime.now().format(dt_frmt) + '\n');
+        fw.append("INSERT INTO INSTRUCTOR, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
 
     }
 
@@ -78,7 +78,7 @@ public class Services {
         Statement stmt = con.createStatement();
         stmt.executeUpdate("INSERT INTO course VALUES(" + new_course.getCourse_id() +
                 ", '" + category + "', " + num_of_months + ", '" + name + "')");
-        fw.append("INSERT INTO COURSE, " + LocalDateTime.now().format(dt_frmt) + '\n');
+        fw.append("INSERT INTO COURSE, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
     }
 
     public void AddCourseFromDB(int id, String name, String category, int num_of_months) throws SQLException {
@@ -138,6 +138,17 @@ public class Services {
 
 
 
+    private void addToUserCourseDB(int student_id, int course_id) throws SQLException, IOException {
+        Statement stmt = con.createStatement();
+        ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM USER_COURSE WHERE COURSE_ID = " + course_id + " AND USER_ID = " + student_id);
+        fw.append("SELECT FROM USER_COURSE, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
+        rs.next();
+        if (rs.getInt(1) == 0) {
+            stmt.executeUpdate("INSERT INTO USER_COURSE VALUES(" + course_id + ", " + student_id + ")");
+            fw.append("INSERT INTO USER_COURSE, " + LocalDateTime.now().format(dt_frmt) + '\n');
+        }
+    }
+
     public void AddStudentToCourse(int student_id, int course_id) throws SQLException, IOException {
         int vector_student_id = bin_lookup(student_id, students);
         if (vector_student_id == -1) {
@@ -149,14 +160,7 @@ public class Services {
                 System.out.println("The course with the id " + course_id + " doesn't exist\n");
             } else {
                 student.add_to_course(courses.elementAt(vector_course_id));
-                Statement stmt = con.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM USER_COURSE WHERE COURSE_ID = " + course_id + " AND USER_ID = " + student_id);
-                fw.append("SELECT FROM USER_COURSE, " + LocalDateTime.now().format(dt_frmt) + '\n');
-                rs.next();
-                if (rs.getInt(1) == 0) {
-                    stmt.executeUpdate("INSERT INTO USER_COURSE VALUES(" + course_id + ", " + student_id + ")");
-                    fw.append("INSERT INTO USER_COURSE, " + LocalDateTime.now().format(dt_frmt) + '\n');
-                }
+                addToUserCourseDB(student_id, course_id);
             }
         }
     }
@@ -174,14 +178,7 @@ public class Services {
                 Course course = courses.elementAt(vector_course_id);
                 instructor.add_to_course(course);
                 course.add_instructor(instructor);
-                Statement stmt = con.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM USER_COURSE WHERE COURSE_ID = " + course_id + " AND USER_ID = " + instructor_id);
-                fw.append("SELECT FROM USER_COURSE, " + LocalDateTime.now().format(dt_frmt) + '\n');
-                rs.next();
-                if (rs.getInt(1) == 0) {
-                    stmt.executeUpdate("INSERT INTO USER_COURSE VALUES(" + course_id + ", " + instructor_id + ")");
-                    fw.append("INSERT INTO USER_COURSE, " + LocalDateTime.now().format(dt_frmt) + '\n');
-                }
+                addToUserCourseDB(instructor_id, course_id);
             }
         }
     }
@@ -259,7 +256,7 @@ public class Services {
                         student_grades.put(student, old_vector);
                         Statement stmt = con.createStatement();
                         stmt.executeUpdate("INSERT INTO GRADE (grade_score, grade_max_score, note, course_id, user_id) VALUES(%f, %f, '%s', %d, %d)".formatted(grade, max_grade, note, course_id, student_id));
-                        fw.append("INSERT INTO GRADE, " + LocalDateTime.now().format(dt_frmt) + '\n');
+                        fw.append("INSERT INTO GRADE, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
                     } else {
                         System.out.println("The student isn't enrolled in this course\n");
                     }
@@ -286,13 +283,13 @@ public class Services {
             AddAssessment(course_id, quiz);
             Statement stmt = con.createStatement();
             stmt.executeUpdate("INSERT INTO ASSESSMENT (name, course_id) VALUES('" + name + "', " + course_id + ")");
-            fw.append("INSERT INTO ASSESSMENT, " + LocalDateTime.now().format(dt_frmt) + '\n');
+            fw.append("INSERT INTO ASSESSMENT, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
             ResultSet rs = stmt.executeQuery("SELECT MAX(ASSESSMENT_ID) FROM ASSESSMENT");
-            fw.append("SELECT FROM ASSESSMENT, " + LocalDateTime.now().format(dt_frmt) + '\n');
+            fw.append("SELECT FROM ASSESSMENT, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
             rs.next();
             stmt.executeUpdate("INSERT INTO QUIZ VALUES (" + rs.getInt(1) + ", " + time_limit
                     + ", " + number_of_questions + ")");
-            fw.append("INSERT INTO QUIZ, " + LocalDateTime.now().format(dt_frmt) + '\n');
+            fw.append("INSERT INTO QUIZ, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
         }
     }
 
@@ -303,13 +300,13 @@ public class Services {
             AddAssessment(course_id, project);
             Statement stmt = con.createStatement();
             stmt.executeUpdate("INSERT INTO ASSESSMENT (name, course_id) VALUES('" + name + "', " + course_id + ")");
-            fw.append("INSERT INTO ASSESSMENT, " + LocalDateTime.now().format(dt_frmt) + '\n');
+            fw.append("INSERT INTO ASSESSMENT, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
             ResultSet rs = stmt.executeQuery("SELECT MAX(ASSESSMENT_ID) FROM ASSESSMENT");
-            fw.append("SELECT FROM ASSESSMENT, " + LocalDateTime.now().format(dt_frmt) + '\n');
+            fw.append("SELECT FROM ASSESSMENT, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
             rs.next();
             stmt.executeUpdate("INSERT INTO PROJECT VALUES (" + rs.getInt(1) +
                     ", TO_DATE('" + date + " " + hour + "','yyyy-mm-dd hh24:mi'))");
-            fw.append("INSERT INTO PROJECT, " + LocalDateTime.now().format(dt_frmt) + '\n');
+            fw.append("INSERT INTO PROJECT, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
         }
 
     }
@@ -338,7 +335,7 @@ public class Services {
             }
 
             stmt.executeUpdate("DELETE FROM INSTRUCTOR WHERE USER_ID = " + user_id);
-            fw.append("DELETE FROM INSTRUCTOR, "+LocalDateTime.now().format(dt_frmt) + '\n');
+            fw.append("DELETE FROM INSTRUCTOR, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
 
             Instructor instructor_rem = instructors.elementAt(vector_id);
             for(var course:courses){
@@ -350,17 +347,17 @@ public class Services {
             Student student_rem = students.elementAt(vector_id);
 
             stmt.executeUpdate("DELETE FROM GRADE WHERE USER_ID = " + user_id);
-            fw.append("DELETE FROM GRADE, "+LocalDateTime.now().format(dt_frmt) + '\n');
+            fw.append("DELETE FROM GRADE, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
 
             student_grades.remove(student_rem);
             students.remove(student_rem);
         }
 
         stmt.executeUpdate("DELETE FROM USER_COURSE WHERE USER_ID = " + user_id);
-        fw.append("DELETE FROM GRADE, "+LocalDateTime.now().format(dt_frmt) + '\n');
+        fw.append("DELETE FROM GRADE, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
 
         stmt.executeUpdate("DELETE FROM APP_USER WHERE USER_ID = " + user_id);
-        fw.append("DELETE FROM APP_USER, "+LocalDateTime.now().format(dt_frmt) + '\n');
+        fw.append("DELETE FROM APP_USER, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
     }
 
     public void renameUser(int user_id, String newname) throws SQLException, IOException {
@@ -369,7 +366,7 @@ public class Services {
         if(vector_id == -1){
             vector_id = bin_lookup(user_id, instructors);
             if(vector_id == -1){
-                System.out.println("User-ul nu exista!\n");
+                System.out.println("This user doesn't exist!\n");
                 return;
             }
             instructors.elementAt(vector_id).setName(newname);
@@ -378,7 +375,19 @@ public class Services {
             students.elementAt(vector_id).setName(newname);
         }
         stmt.executeUpdate("UPDATE APP_USER SET USER_NAME = '" + newname +"' WHERE USER_ID = " + user_id);
-        fw.append("UPDATED APP_USER, " + LocalDateTime.now().format(dt_frmt) + '\n');
+        fw.append("UPDATED APP_USER, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
+    }
+
+    public void renameCourse(int course_id, String newname) throws SQLException, IOException{
+        Statement stmt = con.createStatement();
+        int vector_id = bin_lookup(course_id, courses);
+        if(vector_id == -1){
+            System.out.println("This course doesn't exist!\n");
+            return;
+        }
+        courses.elementAt(vector_id).setCourse_name(newname);
+        stmt.executeUpdate("UPDATE COURSE SET COURSE_NAME = '" + newname + "' WHERE COURSE_ID = " + course_id);
+        fw.append("UPDATED COURSE, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
     }
 
     public void close_connection() throws SQLException {

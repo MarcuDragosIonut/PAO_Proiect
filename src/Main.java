@@ -75,7 +75,7 @@ public class Main {
                     int console_input_2 = -1;
                     while (console_input_2 != 0) {
                         System.out.println("Enter 0 to return\nEnter 1 to add a course\nEnter 2 to display all courses\nEnter 3 to display a course's information" +
-                                "\nEnter 4 to assign a user to a course\n");
+                                "\nEnter 4 to assign a user to a course\nEnter 5 to rename a course\n");
                         console_input_2 = scanner.nextInt();
                         int course_id;
                         switch (console_input_2) {
@@ -119,6 +119,14 @@ public class Main {
                                     default:
                                         break;
                                 }
+                                break;
+                            case 5:
+                                System.out.println("Enter the course's id:");
+                                course_id = scanner.nextInt();
+                                System.out.println("Enter the new name:");
+                                String newname = scanner.nextLine();
+                                newname = scanner.nextLine();
+                                service.renameCourse(course_id, newname);
                                 break;
                         }
                     }
