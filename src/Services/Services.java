@@ -203,11 +203,11 @@ public class Services {
             if (course_assessments.containsKey(course)) {
                 for (var assessment : course_assessments.get(course)) {
                     if (assessment instanceof Project) {
-                        System.out.println(assessment.getName() + " " + ((Project) assessment).Get_deadline());
+                        System.out.println("Project: " + assessment.getName() + " " + ((Project) assessment).Get_deadline());
                     }
                     if (assessment instanceof Quiz) {
-                        System.out.println(assessment.getName() + " minutes: " + ((Quiz) assessment).getTime()
-                                + "\nnumber of questions: " + ((Quiz) assessment).getNumber_of_questions());
+                        System.out.println("Quiz: " + assessment.getName() + " minutes: " + ((Quiz) assessment).getTime()
+                                + " number of questions: " + ((Quiz) assessment).getNumber_of_questions());
                     }
                 }
             }
