@@ -7,7 +7,9 @@ import javax.swing.*;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.*;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -22,7 +24,7 @@ public class Services {
         }
     }
 
-    private static final DateTimeFormatter dt_frmt = DateTimeFormatter.ofPattern("ss:mm:HH dd-MM-yyyy");
+    private static final DateTimeFormatter dt_frmt = DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy");
     private static final FileWriter fw;
 
     static {
@@ -46,7 +48,7 @@ public class Services {
         students.add(new_student);
         Statement stmt = con.createStatement();
         stmt.executeUpdate("INSERT INTO app_user VALUES(" + new_student.getId() + ", '" + name + "')");
-        fw.append("INSERT INTO APP_USER, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
+        fw.append("INSERT INTO APP_USER, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
         fw.flush();
     }
 
@@ -60,9 +62,9 @@ public class Services {
         instructors.add(new_instructor);
         Statement stmt = con.createStatement();
         stmt.executeUpdate("INSERT INTO app_user VALUES(" + new_instructor.getId() + ", '" + name + "')");
-        fw.append("INSERT INTO APP_USER, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
+        fw.append("INSERT INTO APP_USER, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
         stmt.executeUpdate("INSERT INTO instructor VALUES(" + new_instructor.getId() + ", '" + profession + "')");
-        fw.append("INSERT INTO INSTRUCTOR, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
+        fw.append("INSERT INTO INSTRUCTOR, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
 
     }
 
@@ -78,7 +80,7 @@ public class Services {
         Statement stmt = con.createStatement();
         stmt.executeUpdate("INSERT INTO course VALUES(" + new_course.getCourse_id() +
                 ", '" + category + "', " + num_of_months + ", '" + name + "')");
-        fw.append("INSERT INTO COURSE, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
+        fw.append("INSERT INTO COURSE, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
     }
 
     public void AddCourseFromDB(int id, String name, String category, int num_of_months) throws SQLException {
@@ -109,17 +111,15 @@ public class Services {
 
     public int bin_lookup(int s_id, Vector<?> v) {
         var vfe = v.firstElement();
-        int L = 0, R = (vfe instanceof Student) ? students.size() -1 : (vfe instanceof Instructor ? instructors.size() - 1 : courses.size() - 1);
+        int L = 0, R = (vfe instanceof Student) ? students.size() - 1 : (vfe instanceof Instructor ? instructors.size() - 1 : courses.size() - 1);
         int m = (R + L) / 2;
         while (L <= R) {
             int c_id = 0;// students.elementAt(m).getId();
-            if(vfe instanceof Student){
+            if (vfe instanceof Student) {
                 c_id = ((Vector<Student>) v).elementAt(m).getId();
-            }
-            else if(vfe instanceof Instructor){
+            } else if (vfe instanceof Instructor) {
                 c_id = ((Vector<Instructor>) v).elementAt(m).getId();
-            }
-            else if(vfe instanceof Course){
+            } else if (vfe instanceof Course) {
                 c_id = ((Vector<Course>) v).elementAt(m).getCourse_id();
             }
             if (s_id == c_id) {
@@ -137,15 +137,14 @@ public class Services {
     }
 
 
-
     private void addToUserCourseDB(int student_id, int course_id) throws SQLException, IOException {
         Statement stmt = con.createStatement();
         ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM USER_COURSE WHERE COURSE_ID = " + course_id + " AND USER_ID = " + student_id);
-        fw.append("SELECT FROM USER_COURSE, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
+        fw.append("SELECT FROM USER_COURSE, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
         rs.next();
         if (rs.getInt(1) == 0) {
             stmt.executeUpdate("INSERT INTO USER_COURSE VALUES(" + course_id + ", " + student_id + ")");
-            fw.append("INSERT INTO USER_COURSE, " + LocalDateTime.now().format(dt_frmt) + '\n');
+            fw.append("INSERT INTO USER_COURSE, " + Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt) + '\n');
         }
     }
 
@@ -201,7 +200,7 @@ public class Services {
                 }
             }
             System.out.println("Assessments: ");
-            if(course_assessments.containsKey(course)) {
+            if (course_assessments.containsKey(course)) {
                 for (var assessment : course_assessments.get(course)) {
                     if (assessment instanceof Project) {
                         System.out.println(assessment.getName() + " " + ((Project) assessment).Get_deadline());
@@ -256,7 +255,7 @@ public class Services {
                         student_grades.put(student, old_vector);
                         Statement stmt = con.createStatement();
                         stmt.executeUpdate("INSERT INTO GRADE (grade_score, grade_max_score, note, course_id, user_id) VALUES(%f, %f, '%s', %d, %d)".formatted(grade, max_grade, note, course_id, student_id));
-                        fw.append("INSERT INTO GRADE, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
+                        fw.append("INSERT INTO GRADE, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
                     } else {
                         System.out.println("The student isn't enrolled in this course\n");
                     }
@@ -279,34 +278,34 @@ public class Services {
     public void AddQuiz(String name, int number_of_questions, int time_limit, int course_id) throws SQLException, IOException {
         Quiz quiz = new Quiz(name, number_of_questions, time_limit);
         int vector_course_id = bin_lookup(course_id, courses);
-        if(vector_course_id != -1) {
+        if (vector_course_id != -1) {
             AddAssessment(course_id, quiz);
             Statement stmt = con.createStatement();
             stmt.executeUpdate("INSERT INTO ASSESSMENT (name, course_id) VALUES('" + name + "', " + course_id + ")");
-            fw.append("INSERT INTO ASSESSMENT, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
-            ResultSet rs = stmt.executeQuery("SELECT MAX(ASSESSMENT_ID) FROM ASSESSMENT");
-            fw.append("SELECT FROM ASSESSMENT, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
+            fw.append("INSERT INTO ASSESSMENT, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
+            ResultSet rs = stmt.executeQuery("SELECT MAX(ASSESSMENT_ID) FROM ASSESSMENT WHERE NAME = '" + name + "' AND COURSE_ID = " + course_id);
+            fw.append("SELECT FROM ASSESSMENT, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
             rs.next();
             stmt.executeUpdate("INSERT INTO QUIZ VALUES (" + rs.getInt(1) + ", " + time_limit
                     + ", " + number_of_questions + ")");
-            fw.append("INSERT INTO QUIZ, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
+            fw.append("INSERT INTO QUIZ, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
         }
     }
 
     public void AddProject(String name, String date, String hour, int course_id) throws SQLException, IOException {
         Project project = new Project(name, date, hour);
         int vector_course_id = bin_lookup(course_id, courses);
-        if(vector_course_id != -1) {
+        if (vector_course_id != -1) {
             AddAssessment(course_id, project);
             Statement stmt = con.createStatement();
             stmt.executeUpdate("INSERT INTO ASSESSMENT (name, course_id) VALUES('" + name + "', " + course_id + ")");
-            fw.append("INSERT INTO ASSESSMENT, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
-            ResultSet rs = stmt.executeQuery("SELECT MAX(ASSESSMENT_ID) FROM ASSESSMENT");
-            fw.append("SELECT FROM ASSESSMENT, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
+            fw.append("INSERT INTO ASSESSMENT, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
+            ResultSet rs = stmt.executeQuery("SELECT MAX(ASSESSMENT_ID) FROM ASSESSMENT WHERE NAME = '" + name + "' AND COURSE_ID = " + course_id);
+            fw.append("SELECT FROM ASSESSMENT, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
             rs.next();
             stmt.executeUpdate("INSERT INTO PROJECT VALUES (" + rs.getInt(1) +
                     ", TO_DATE('" + date + " " + hour + "','yyyy-mm-dd hh24:mi'))");
-            fw.append("INSERT INTO PROJECT, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
+            fw.append("INSERT INTO PROJECT, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
         }
 
     }
@@ -327,72 +326,71 @@ public class Services {
     public void deleteUser(int user_id) throws SQLException, IOException {
         Statement stmt = con.createStatement();
         int vector_id = bin_lookup(user_id, students);
-        if(vector_id == -1) { // adica e instructor sau nu exista
+        if (vector_id == -1) { // adica e instructor sau nu exista
             vector_id = bin_lookup(user_id, instructors);
-            if (vector_id == -1){ // userul nu exista
+            if (vector_id == -1) { // userul nu exista
                 System.out.println("User-ul nu exista!\n");
                 return;
             }
 
             stmt.executeUpdate("DELETE FROM INSTRUCTOR WHERE USER_ID = " + user_id);
-            fw.append("DELETE FROM INSTRUCTOR, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
+            fw.append("DELETE FROM INSTRUCTOR, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
 
             Instructor instructor_rem = instructors.elementAt(vector_id);
-            for(var course:courses){
+            for (var course : courses) {
                 course.remove_instructor(instructor_rem);
             }
             instructors.remove(instructor_rem);
-        }
-        else{ // adica e student
+        } else { // adica e student
             Student student_rem = students.elementAt(vector_id);
 
             stmt.executeUpdate("DELETE FROM GRADE WHERE USER_ID = " + user_id);
-            fw.append("DELETE FROM GRADE, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
+            fw.append("DELETE FROM GRADE, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
 
             student_grades.remove(student_rem);
             students.remove(student_rem);
         }
 
         stmt.executeUpdate("DELETE FROM USER_COURSE WHERE USER_ID = " + user_id);
-        fw.append("DELETE FROM GRADE, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
+        fw.append("DELETE FROM GRADE, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
 
         stmt.executeUpdate("DELETE FROM APP_USER WHERE USER_ID = " + user_id);
-        fw.append("DELETE FROM APP_USER, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
+        fw.append("DELETE FROM APP_USER, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
     }
 
     public void renameUser(int user_id, String newname) throws SQLException, IOException {
         Statement stmt = con.createStatement();
         int vector_id = bin_lookup(user_id, students);
-        if(vector_id == -1){
+        if (vector_id == -1) {
             vector_id = bin_lookup(user_id, instructors);
-            if(vector_id == -1){
+            if (vector_id == -1) {
                 System.out.println("This user doesn't exist!\n");
                 return;
             }
             instructors.elementAt(vector_id).setName(newname);
-        }
-        else{
+        } else {
             students.elementAt(vector_id).setName(newname);
         }
-        stmt.executeUpdate("UPDATE APP_USER SET USER_NAME = '" + newname +"' WHERE USER_ID = " + user_id);
-        fw.append("UPDATED APP_USER, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
+        stmt.executeUpdate("UPDATE APP_USER SET USER_NAME = '" + newname + "' WHERE USER_ID = " + user_id);
+        fw.append("UPDATED APP_USER, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
     }
 
-    public void renameCourse(int course_id, String newname) throws SQLException, IOException{
+    public void renameCourse(int course_id, String newname) throws SQLException, IOException {
         Statement stmt = con.createStatement();
         int vector_id = bin_lookup(course_id, courses);
-        if(vector_id == -1){
+        if (vector_id == -1) {
             System.out.println("This course doesn't exist!\n");
             return;
         }
         courses.elementAt(vector_id).setCourse_name(newname);
         stmt.executeUpdate("UPDATE COURSE SET COURSE_NAME = '" + newname + "' WHERE COURSE_ID = " + course_id);
-        fw.append("UPDATED COURSE, ").append(LocalDateTime.now().format(dt_frmt)).append(String.valueOf('\n'));
+        fw.append("UPDATED COURSE, ").append(Instant.now().atZone(ZoneId.of("Europe/Bucharest")).format(dt_frmt)).append(String.valueOf('\n'));
     }
 
     public void close_connection() throws SQLException {
         con.close();
     }
+
     public void close_file() throws IOException {
         fw.close();
     }
